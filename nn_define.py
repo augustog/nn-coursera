@@ -2,6 +2,7 @@ __author__ = 'augusto'
 
 import numpy as np
 
+
 class NN(object):
     """
     Neural network class
@@ -34,8 +35,8 @@ class NN(object):
         #Second, the matrices that connect each layer
 
         mat_dims = np.concatenate((
-            units[1:, np.newaxis],
-            units[:-1, np.newaxis],
+                                      units[1:, np.newaxis],
+                                      units[:-1, np.newaxis],
                                   ),
                                   axis=1
         )
@@ -49,7 +50,7 @@ class NN(object):
 
         layers = []
         for i in units:
-            layers.append(np.zeros(i,dtype=np.float64))
+            layers.append(np.zeros(i, dtype=np.float64))
 
         mats = []
         for shape in map(tuple, mat_dims):
@@ -58,25 +59,62 @@ class NN(object):
         self._layer_values_vectors = layers
         self._layer_interconnection_matrices = mats
 
-    def predict(self):
-        output_vector = np.ones(1)
-        return output_vector
+        self.input_shape = (units[0].astype(np.int),)
 
-    def fit(self):
+
+    def predict(self, x):
+        """
+        Predict y from input x
+        """
+        layers = len(self._layer_values_vectors)
+        try:
+            if x.shape != self.input_shape:
+                raise ValueError("incompatible dimensions")
+        except AttributeError:
+            raise ValueError("x must be np.array")
+        self._layer_values_vectors[0] = x
+        for idx in xrange(layers - 1):
+            self._layer_values_vectors[idx + 1] = (
+                self._layer_values_vectors[idx] *
+                self._layer_interconnection_matrices[idx]
+            )
+        return self._layer_values_vectors[-1]
+
+    def fit(self, X, y):
+        """
+        Fit the model to the training data.
+        X is training input
+        y is desired output
+        """
+        try:
+            x_shape = X.shape
+            y_shape = y.shape
+        except AttributeError:
+            raise ValueError("x must be np.array")
+        desired_X_shape = tuple([y_shape, self.input_shape])
+
+        if x_shape == desired_X_shape:
+            sample_axis = 0
+        elif x_shape[::-1] == desired_X_shape:
+            sample_axis = 1
+        else:
+            raise ValueError("incompatible dimensions")
+
         return self
 
     def __repr__(self):
         if self._repr_deep:
             representation = ""
             n = 0
-            for mat in self.mats:
+            for mat in self._layer_interconnection_matrices:
                 representation += """
                 Layer {} to {}
                 ===============
-                """.format(n, n+1)+repr(mat)+"\n"
+                """.format(n, n + 1) + repr(mat) + "\n\n"
                 n += 1
         else:
             representation = "<NeuralNetwork NN instance of shape {}, >".format(str(self.units))
+        return representation
 
     @classmethod
     def repr_deep(cls, represent_deep=True):
