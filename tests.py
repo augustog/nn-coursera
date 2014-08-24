@@ -33,7 +33,9 @@ class NNPredict (unittest.TestCase):
 
     def test_predict(self):
         input = np.array([1, 1, 1])
-        self.assertEqual(self.nn.predict(input)[0], 9)
+        predicted_value = self.nn.predict(input)
+        self.assertTupleEqual(predicted_value.shape, (1,))
+        self.assertEqual(predicted_value[0], 9)
 
 
 class NNOptimize (unittest.TestCase):
