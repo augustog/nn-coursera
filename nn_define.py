@@ -13,8 +13,7 @@ class NN(object):
     _repr_deep = False
 
 
-    def __init__(self, units):
-        self.make(units)
+    def __init__(self):
         super(NN, self).__init__()
 
     def make(self, units, use_sparse_matrix=False):
@@ -28,7 +27,8 @@ class NN(object):
         sparse matrices (cost effective for nns that enforce local connectivity as in image recognition NNs).
         """
 
-        self.units = np.array(units)     #Convert to np.array if not already
+        units = np.array(units)     #Convert to np.array if not already
+        self.units = units
 
         #Next, define internal data structures
         #First, the vectors that will hold the value for each neuron
@@ -72,11 +72,14 @@ class NN(object):
                 raise ValueError("incompatible dimensions")
         except AttributeError:
             raise ValueError("x must be np.array")
+
         self._layer_values_vectors[0] = x
         for idx in xrange(layers - 1):
             self._layer_values_vectors[idx + 1] = (
-                self._layer_values_vectors[idx] *
-                self._layer_interconnection_matrices[idx]
+                np.dot(
+                    self._layer_interconnection_matrices[idx],
+                    self._layer_values_vectors[idx]
+                )
             )
         return self._layer_values_vectors[-1]
 
@@ -99,6 +102,15 @@ class NN(object):
             sample_axis = 1
         else:
             raise ValueError("incompatible dimensions")
+
+        #TODO: Check if this can be avoided, big datasets will appreciate
+        if sample_axis == 1:
+            X = np.transpose(X)
+            y = np.transpose(y)
+
+        #First predict for all training samples
+        for idx in range(X.shape[0]):
+            error = self.predict(X[idx, ...])-y[idx]
 
         return self
 
