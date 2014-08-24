@@ -61,6 +61,7 @@ class NN(object):
 
         self.input_shape = (units[0].astype(np.int),)
 
+    #Interface for compatibility with scikit-learn
 
     def predict(self, x):
         """
@@ -107,12 +108,10 @@ class NN(object):
         if sample_axis == 1:
             X = np.transpose(X)
             y = np.transpose(y)
-
-        #First predict for all training samples
-        for idx in range(X.shape[0]):
-            error = self.predict(X[idx, ...])-y[idx]
-
+        self._fit(X, y)
         return self
+
+    #Representation control
 
     def __repr__(self):
         if self._repr_deep:
@@ -131,5 +130,10 @@ class NN(object):
     @classmethod
     def repr_deep(cls, represent_deep=True):
         cls._repr_deep = represent_deep
+
+    #Internals
+    def _fit(self, X, y):
+        pass
+
 
 
