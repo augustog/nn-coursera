@@ -35,13 +35,28 @@ class NNPredict (unittest.TestCase):
         input = np.array([1, 1, 1])
         self.assertEqual(self.nn.predict(input)[0], 9)
 
-    def test_fit(self):
-        pass
-
 
 class NNOptimize (unittest.TestCase):
-    def test_cost_function(self):
-        pass
+    def setUp(self):
+        self.nn = ndef.NN()
+        self.nn.make([3, 3, 1])
+
+    def test_nonregularized_cost_function(self):
+        """
+        Test cost function
+        J(Theta) = SquaredError
+        given a NN like the one in NNPredict test suite, and
+        three equal inputs (whose output is np.array([9]))
+        and given the target values 8, 10 and 8,
+        total squared error should be 3.
+        """
+        X = np.array([[1,1,1],[1,1,1],[1,1,1]])
+        y = np.array([[8],[10],[8]])
+
+        cost = self.nn._cost_not_regularized(X, y)
+        self.assertIsInstance(cost, np.float64)
+        self.assertEqual(cost, 3.)
+
     def test_optimize(self):
         pass
 
