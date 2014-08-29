@@ -12,5 +12,5 @@ def cost_not_regularized(self, X, y):
     y is np.array of y.shape (K, N)
     """
     #TODO: Think of vectorized way of obtaining cost function
-    
+
     return np.float64(3)
